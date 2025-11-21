@@ -8,13 +8,20 @@
 import SwiftUI
 import Combine
 
+/// A singleton class that manages and publishes error messages throughout the app.
 final class ErrorManager: ObservableObject {
-    static let shared = ErrorManager()  // singleton for global access
     
+    /// Shared instance for global access.
+    static let shared = ErrorManager()
+    
+    /// Published error message that views can observe to show alerts.
     @Published var errorMessage: String? = nil
     
+    /// Private initializer to enforce singleton usage.
     private init() {}
     
+    /// Sets the error message based on the provided `UnsplashError`.
+    /// - Parameter error: The error to be displayed.
     func show(error: UnsplashError) {
         switch error {
         case .missingAPIKey:
@@ -40,6 +47,7 @@ final class ErrorManager: ObservableObject {
         }
     }
     
+    /// Clears the current error message.
     func dismiss() {
         errorMessage = nil
     }

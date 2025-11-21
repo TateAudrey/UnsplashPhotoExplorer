@@ -7,7 +7,10 @@
 
 import SwiftUI
 
+/// A sheet view displaying detailed information about a photo's EXIF metadata.
 struct PhotoInfoSheet: View {
+
+    /// The photo object containing metadata
     let photo: Photo
 
     var body: some View {
@@ -23,7 +26,7 @@ struct PhotoInfoSheet: View {
                 }
                 .padding(.bottom, 10)
 
-                // "Camera Details" section
+                // Section title: Camera Details
                 HStack(spacing: 10) {
                     Image(systemName: "camera")
                         .font(.title3)
@@ -31,7 +34,7 @@ struct PhotoInfoSheet: View {
                         .font(.headline)
                 }
 
-                // Details
+                // Camera metadata rows
                 Group {
                     detailRow(label: "Make", value: photo.exif?.make ?? "N/A")
                     detailRow(label: "Model", value: photo.exif?.model ?? "N/A")
@@ -47,6 +50,7 @@ struct PhotoInfoSheet: View {
         }
     }
 
+    /// Reusable row for displaying a label and its value
     @ViewBuilder
     func detailRow(label: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 3) {
@@ -58,4 +62,3 @@ struct PhotoInfoSheet: View {
         }
     }
 }
-

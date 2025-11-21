@@ -9,41 +9,56 @@ import SwiftUI
 import WebKit
 import Combine
 
+/// ViewModel to manage a WKWebView in SwiftUI.
+/// Tracks loading progress, navigation state, and current URL.
 class WebViewModel: ObservableObject {
-    // Navigation state
+    
+    // MARK: - Navigation State
+    
+    /// Whether the web view can go back
     @Published var canGoBack = false
+    
+    /// Whether the web view can go forward
     @Published var canGoForward = false
+    
+    /// The currently loaded URL
     @Published var currentURL: URL?
 
-    // Loading state
+    // MARK: - Loading State
+    
+    /// Indicates whether the web view is currently loading
     @Published var isLoading: Bool = false
-    @Published var progress: Double = 0.0   // 0.0 .. 1.0
+    
+    /// Linear progress of the current page load (0.0 ... 1.0)
+    @Published var progress: Double = 0.0
 
-    /// Keep a single WKWebView instance
+    /// Single WKWebView instance used by SwiftUI view
     let webView: WKWebView
 
-    // KVO observation tokens (retain them)
+    // MARK: - KVO Observers
+    
     private var estimatedProgressObserver: NSKeyValueObservation?
     private var isLoadingObserver: NSKeyValueObservation?
 
+    // MARK: - Initialization
+    
     init() {
         let config = WKWebViewConfiguration()
         self.webView = WKWebView(frame: .zero, configuration: config)
 
-        // Observe estimatedProgress (KVO)
-        estimatedProgressObserver = webView.observe(\.estimatedProgress, options: [.new]) { [weak self] webView, change in
+        // Observe estimatedProgress to update progress bar
+        estimatedProgressObserver = webView.observe(\.estimatedProgress, options: [.new]) { [weak self] webView, _ in
             guard let self = self else { return }
             DispatchQueue.main.async {
                 self.progress = webView.estimatedProgress
             }
         }
 
-        // Observe isLoading (KVO) to update isLoading boolean
-        isLoadingObserver = webView.observe(\.isLoading, options: [.new, .initial]) { [weak self] webView, change in
+        // Observe isLoading to update navigation state
+        isLoadingObserver = webView.observe(\.isLoading, options: [.new, .initial]) { [weak self] webView, _ in
             guard let self = self else { return }
             DispatchQueue.main.async {
                 self.isLoading = webView.isLoading
-                // Update navigation buttons as loading state can change navigation availability
                 self.canGoBack = webView.canGoBack
                 self.canGoForward = webView.canGoForward
                 self.currentURL = webView.url
@@ -52,14 +67,19 @@ class WebViewModel: ObservableObject {
     }
 
     deinit {
-        // Observers are automatically removed when deallocated, but explicitly nil them for clarity
+        // Clear observers explicitly
         estimatedProgressObserver = nil
         isLoadingObserver = nil
     }
 
-    // Navigation helpers
+    // MARK: - Navigation Helpers
+    
+    /// Navigate back in web view history
     func goBack() { webView.goBack() }
+    
+    /// Navigate forward in web view history
     func goForward() { webView.goForward() }
+    
+    /// Reload the current page
     func refresh() { webView.reload() }
 }
-

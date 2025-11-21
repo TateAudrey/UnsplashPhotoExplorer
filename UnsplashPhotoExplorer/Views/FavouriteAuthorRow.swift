@@ -8,18 +8,25 @@
 import SwiftUI
 import Kingfisher
 
+/// A row view that displays information about a favourite author,
+/// including their profile image, name, and label.
+/// Designed for use in lists  of authors.
 struct FavouriteAuthorRow: View {
+    
+    /// The author to display
     let author: Author
 
     var body: some View {
         HStack(spacing: 16) {
+            // Profile image loaded asynchronously using Kingfisher
             KFImage(URL(string: author.imageURL))
-                .placeholder { ProgressView() }
+                .placeholder { ProgressView() } // Show spinner while loading
                 .resizable()
                 .scaledToFill()
                 .frame(width: 60, height: 60)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
+            // Author details
             VStack(alignment: .leading, spacing: 6) {
                 Text("Author")
                     .font(.subheadline)
@@ -40,7 +47,7 @@ struct FavouriteAuthorRow: View {
     }
 }
 
-
+// MARK: - Previews
 
 struct FavouriteAuthorRow_Previews: PreviewProvider {
     static var previews: some View {

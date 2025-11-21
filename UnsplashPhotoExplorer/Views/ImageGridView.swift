@@ -7,10 +7,14 @@
 
 import SwiftUI
 
+/// A view that displays up to four images in a 2-column grid.
+/// Designed for previewing or summarizing a set of images.
 struct ImageGridView: View {
+    
+    /// Array of image URLs (as Strings) to display
     let images: [String]
 
-    // 2 columns grid
+    /// 2-column flexible grid layout
     let columns = [
         GridItem(.flexible(), spacing: 10),
         GridItem(.flexible(), spacing: 10)
@@ -20,13 +24,16 @@ struct ImageGridView: View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 10) {
                 ForEach(images.prefix(4), id: \.self) { url in
-                    
+                    // TODO: Display the image
+                    // e.g., use AsyncImage(url: URL(string: url)) { ... }
                 }
             }
             .padding(10)
         }
     }
 }
+
+// MARK: - Preview
 
 struct ImageGridView_Previews: PreviewProvider {
     static let sampleImages: [String] = [
@@ -43,11 +50,9 @@ struct ImageGridView_Previews: PreviewProvider {
 
     static var previews: some View {
         Group {
-            // Preview in light mode
             ImageGridView(images: sampleImages)
                 .previewDisplayName("Light Mode")
             
-            // Preview in dark mode
             ImageGridView(images: sampleImages)
                 .preferredColorScheme(.dark)
                 .previewDisplayName("Dark Mode")

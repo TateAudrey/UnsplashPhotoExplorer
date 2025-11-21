@@ -8,23 +8,32 @@
 import SwiftUI
 import Combine
 
+/// An `ObservableObject` that manages the app-wide state for liked authors.
+/// Supports fast membership checks, coalesced asynchronous saving to UserDefaults,
+/// and reactive updates for SwiftUI views.
 @MainActor
 class AppState: ObservableObject {
     
+    /// The list of liked authors. SwiftUI views observing this will update automatically.
     @Published private(set) var likedAuthors: [Author] = []
-    // Fast membership checks to avoid repeated linear scans
+
+    /// Fast lookup set to check if an author is liked without scanning the array.
     private var likedAuthorIDs: Set<String> = []
 
+    /// Key for persisting liked authors in UserDefaults.
     private let defaultsKey = "likedAuthors"
 
-    // Coalesced async saving
+    /// Task for coalescing rapid save operations to avoid multiple writes.
     private var pendingSaveTask: Task<Void, Never>?
 
+    /// Initializes the state by loading any previously liked authors.
     init() {
         load()
     }
 
-    // Load from UserDefaults
+    // MARK: - Persistence
+
+    /// Loads liked authors from UserDefaults.
     private func load() {
         guard let data = UserDefaults.standard.data(forKey: defaultsKey) else { return }
         if let decoded = try? JSONDecoder().decode([Author].self, from: data) {
@@ -33,9 +42,9 @@ class AppState: ObservableObject {
         }
     }
 
-    // Coalesce and move the encoding/write off the main actor
+    /// Saves liked authors asynchronously with coalescing to prevent multiple rapid writes.
     private func save() {
-        // Cancel any in-flight save so rapid taps don't queue many writes
+        // Cancel any in-flight save to avoid queueing multiple writes
         pendingSaveTask?.cancel()
 
         // Capture a snapshot on the MainActor
@@ -43,36 +52,45 @@ class AppState: ObservableObject {
 
         pendingSaveTask = Task.detached(priority: .background) { [defaultsKey] in
             guard let encoded = try? JSONEncoder().encode(snapshot) else { return }
-            // UserDefaults is thread-safe for set(_:forKey:); doing this off main avoids UI stalls
+            // Safe to write UserDefaults off the main thread
             UserDefaults.standard.set(encoded, forKey: defaultsKey)
         }
     }
 
-    // Add/remove author
+    // MARK: - Author Management
+
+    /// Adds or removes an author from likedAuthors. Toggles their status.
+    /// - Parameter author: The `Author` to toggle.
     func toggleAuthor(_ author: Author) {
         if likedAuthorIDs.contains(author.id) {
-            likedAuthors.removeAll(where: { $0.id == author.id })
+            likedAuthors.removeAll { $0.id == author.id }
             likedAuthorIDs.remove(author.id)
         } else {
             likedAuthors.append(author)
             likedAuthorIDs.insert(author.id)
         }
-        // Persist asynchronously without blocking the UI thread
         save()
     }
 
+    /// Checks if an author is currently liked.
+    /// - Parameter author: The `Author` to check.
+    /// - Returns: `true` if the author is liked.
     func isAuthorLiked(_ author: Author) -> Bool {
         likedAuthorIDs.contains(author.id)
     }
 
-    // Show Likes tab only when needed
-    var hasLikes: Bool {
-        !likedAuthors.isEmpty
-    }
-    
+    /// Removes a specific author from likedAuthors.
+    /// - Parameter author: The `Author` to remove.
     func removeAuthor(_ author: Author) {
         likedAuthors.removeAll { $0.id == author.id }
+        likedAuthorIDs.remove(author.id)
         save()
     }
 
+    // MARK: - Convenience
+
+    /// Returns `true` if there are any liked authors.
+    var hasLikes: Bool {
+        !likedAuthors.isEmpty
+    }
 }

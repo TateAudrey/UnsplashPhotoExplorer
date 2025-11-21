@@ -8,15 +8,25 @@
 import SwiftUI
 import Kingfisher
 
+import SwiftUI
+import Kingfisher
+
+/// View displaying a single photo in full size along with author details, like button, and info sheet.
 struct PhotoDetailView: View {
 
-    let photo: Photo  // Full photo object
+    /// Full photo object to display
+    let photo: Photo
 
+    /// App-wide state for liked authors
     @EnvironmentObject var appState: AppState
+
+    /// Environment dismiss function to close this view
     @Environment(\.dismiss) private var dismiss
+
+    /// Controls presentation of photo info sheet
     @State private var showInfoSheet = false
 
-    // Cache the author once for this view instance
+    /// Cached Author object for this photo
     private var author: Author {
         Author(
             id: photo.user.id,
@@ -28,7 +38,7 @@ struct PhotoDetailView: View {
 
     var body: some View {
         ZStack {
-            // Image with Kingfisher placeholder
+            // Display the photo using Kingfisher
             KFImage(photo.urls.regular)
                 .resizable()
                 .cacheOriginalImage()
@@ -41,7 +51,6 @@ struct PhotoDetailView: View {
                     }
                     .ignoresSafeArea()
                 }
-
                 .scaledToFit()
                 .ignoresSafeArea()
         }
@@ -55,14 +64,14 @@ struct PhotoDetailView: View {
                 .imageScale(.large)
             }
 
-            // Title
+            // Title showing author name
             ToolbarItem(placement: .principal) {
                 Text(photo.user.name)
                     .font(.headline)
                     .lineLimit(1)
             }
 
-            // Info button
+            // Info sheet button
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: { showInfoSheet.toggle() }) {
                     Image(systemName: "info.circle")
@@ -70,7 +79,7 @@ struct PhotoDetailView: View {
                 .imageScale(.large)
             }
 
-            // Like button
+            // Like / favorite button
             ToolbarItem(placement: .navigationBarTrailing) {
                 let isLiked = appState.isAuthorLiked(author)
                 Button(action: {
@@ -82,12 +91,11 @@ struct PhotoDetailView: View {
                         .foregroundColor(isLiked ? .red : .primary)
                 }
             }
-
         }
+        // Present info sheet for the photo
         .sheet(isPresented: $showInfoSheet) {
             PhotoInfoSheet(photo: photo)
                 .presentationDetents([.medium, .large])
         }
     }
 }
-

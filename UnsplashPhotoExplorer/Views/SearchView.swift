@@ -8,9 +8,11 @@
 import SwiftUI
 import Kingfisher
 
+/// Main search view for browsing Unsplash photos
 struct SearchView: View {
-    @StateObject private var vm = SearchViewModel()
+    @StateObject private var vm = SearchViewModel() // ViewModel managing search state
     
+    // Adaptive grid layout
     private let columns: [GridItem] = [
         GridItem(.adaptive(minimum: 150), spacing: 10)
     ]
@@ -18,6 +20,7 @@ struct SearchView: View {
     var body: some View {
         NavigationStack {
             Group {
+                // Empty state
                 if vm.filteredPhotos.isEmpty && vm.searchQuery.isEmpty {
                     VStack {
                         Spacer()
@@ -27,10 +30,11 @@ struct SearchView: View {
                         Spacer()
                     }
                 } else {
+                    // Photo grid
                     ScrollView {
                         PhotoGrid(photos: vm.filteredPhotos) {
                             Task {
-                                await vm.searchPhotos()
+                                await vm.searchPhotos() // Load more when scrolled to bottom
                             }
                         }
                         
@@ -41,27 +45,28 @@ struct SearchView: View {
                         }
                     }
                     .padding(10)
-                    
                 }
             }
             .navigationTitle("Search")
         }
         .searchable(text: $vm.searchQuery, prompt: "Search photos")
         .onChange(of: vm.searchQuery) { _, newValue in
-            vm.debouncedSearch(query: newValue)
+            vm.debouncedSearch(query: newValue) // Debounce typing
         }
     }
 }
 
+/// Grid view showing photos and handling pagination
 struct PhotoGrid: View {
     let photos: [Photo]
-    let onScrolledToBottom: () -> Void
+    let onScrolledToBottom: () -> Void // Triggered when last photo appears
     
     var body: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
             ForEach(photos) { photo in
                 PhotoGridItemRow(photo: photo)
                     .onAppear {
+                        // Trigger loading more photos when reaching the last item
                         if photo == photos.last {
                             onScrolledToBottom()
                         }
@@ -71,6 +76,7 @@ struct PhotoGrid: View {
     }
 }
 
+/// Single photo grid item row
 struct PhotoGridItemRow: View {
     let photo: Photo
     
