@@ -14,7 +14,7 @@ Unsplash Photo Explorer is a SwiftUI app that displays beautiful photos from Uns
 
 ## Screenshots
 
-<img width="450" height="920" alt="Home Screen" src="https://github.com/user-attachments/assets/d3c732fb-1765-4338-a639-254a7633a876" /> <img width="450" height="920" alt="Photo Info Sheet" src="https://github.com/user-attachments/assets/dc83240a-ccf1-48d2-b46a-6b81c0d8beae" />
+<img width="450" height="920" alt="Home Screen" src="https://github.com/user-attachments/assets/9762f46c-0b53-4998-8f59-d7a7fd800e46" /> <img width="450" height="920" alt="Photo Info Sheet" src="https://github.com/user-attachments/assets/e7bba1a4-ff3f-46b3-a9f4-858c16cd8739" />
 
 ---
 
@@ -28,7 +28,8 @@ cd UnsplashPhotoExplorer
 
 2. Open the project in **Xcode 26** or later.
 3. Sign the Xcode project if needed.
-4. Add your Unsplash API key:
+4. Navigate to UnsplashPhotoExplorer/UnsplashPhotoExplorer/APIConfig -> open Secrets.xconfig file
+5. Add your Unsplash API key:
 
 * **Preferred (Secrets.xconfig):**
 
