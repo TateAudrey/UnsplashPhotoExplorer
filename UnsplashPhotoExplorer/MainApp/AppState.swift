@@ -35,10 +35,16 @@ class AppState: ObservableObject {
 
     /// Loads liked authors from UserDefaults.
     private func load() {
-        guard let data = UserDefaults.standard.data(forKey: defaultsKey) else { return }
-        if let decoded = try? JSONDecoder().decode([Author].self, from: data) {
-            likedAuthors = decoded
-            likedAuthorIDs = Set(decoded.map { $0.id })
+        // Perform decoding off main thread
+        Task.detached(priority: .background) { [weak self] in
+            guard let self = self,
+                  let data = UserDefaults.standard.data(forKey: self.defaultsKey),
+                  let decoded = try? JSONDecoder().decode([Author].self, from: data) else { return }
+
+            await MainActor.run {
+                self.likedAuthors = decoded
+                self.likedAuthorIDs = Set(decoded.map { $0.id })
+            }
         }
     }
 

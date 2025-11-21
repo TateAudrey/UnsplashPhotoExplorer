@@ -15,7 +15,7 @@ struct FavouriteAuthorView: View {
     @EnvironmentObject var appState: AppState
     
     /// Single instance of WebViewModel for navigation
-    @StateObject private var webViewModel = WebViewModel()
+   // @StateObject private var webViewModel = WebViewModel()
 
     var body: some View {
         NavigationStack {
@@ -23,9 +23,8 @@ struct FavouriteAuthorView: View {
                 // Iterate over liked authors
                 ForEach(appState.likedAuthors) { author in
                     NavigationLink {
-                        // Navigate to WebView showing author's profile
                         if let url = URL(string: author.profileURL) {
-                            WebViewContainer(url: url, viewModel: webViewModel)
+                            WebViewContainer(url: url, viewModel: WebViewModel()) // new instance per link
                         } else {
                             Text("Invalid profile URL")
                         }

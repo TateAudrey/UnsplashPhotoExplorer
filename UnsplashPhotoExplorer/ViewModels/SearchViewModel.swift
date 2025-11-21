@@ -56,9 +56,9 @@ final class SearchViewModel: ObservableObject {
     /// Performs a debounced search to avoid excessive API calls.
     /// - Parameter query: The search query string
     func debouncedSearch(query: String) {
-        searchTask?.cancel() // Cancel any in-flight task
+        searchTask?.cancel()
         searchTask = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: 300_000_000) // 0.3s debounce
+            try? await Task.sleep(nanoseconds: 300_000_000)
             await self?.searchPhotos(reset: true)
         }
     }
@@ -86,11 +86,13 @@ final class SearchViewModel: ObservableObject {
         let result = await client.searchPhotos(query: searchQuery, page: currentPage, perPage: perPage)
         switch result {
         case .success(let response):
-            // Append new photos to existing list
-            filteredPhotos.append(contentsOf: response.photos)
-            totalResults = response.total
-            currentPage += 1
-            hasMoreResults = filteredPhotos.count < totalResults
+            // Off-main-thread decoding already done in UnsplashAPIClient
+            await MainActor.run {
+                filteredPhotos.append(contentsOf: response.photos.prefix(20)) // limit initial batch
+                totalResults = response.total
+                currentPage += 1
+                hasMoreResults = filteredPhotos.count < totalResults
+            }
         case .failure(let error):
             // Show API errors using ErrorManager
             Task { @MainActor in
