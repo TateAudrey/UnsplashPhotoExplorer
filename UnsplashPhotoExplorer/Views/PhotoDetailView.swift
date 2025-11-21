@@ -8,25 +8,13 @@
 import SwiftUI
 import Kingfisher
 
-import SwiftUI
-import Kingfisher
-
-/// View displaying a single photo in full size along with author details, like button, and info sheet.
 struct PhotoDetailView: View {
-
-    /// Full photo object to display
     let photo: Photo
-
-    /// App-wide state for liked authors
     @EnvironmentObject var appState: AppState
-
-    /// Environment dismiss function to close this view
     @Environment(\.dismiss) private var dismiss
-
-    /// Controls presentation of photo info sheet
     @State private var showInfoSheet = false
+    @Environment(\.colorScheme) private var colorScheme
 
-    /// Cached Author object for this photo
     private var author: Author {
         Author(
             id: photo.user.id,
@@ -37,26 +25,33 @@ struct PhotoDetailView: View {
     }
 
     var body: some View {
-        ZStack {
-            // Display the photo using Kingfisher
-            KFImage(photo.urls.regular)
-                .resizable()
-                .cacheOriginalImage()
-                .placeholder {
-                    ZStack {
-                        Color.gray.opacity(0.2)
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            .scaleEffect(2)
-                    }
+        GeometryReader { geo in
+            ZStack {
+                // Adaptive background
+                Color(colorScheme == .dark ? .black : .systemBackground)
                     .ignoresSafeArea()
-                }
-                .scaledToFit()
-                .ignoresSafeArea()
+
+                // Centered image
+                KFImage(photo.urls.regular)
+                    .resizable()
+                    .cacheOriginalImage()
+                    .placeholder {
+                        ZStack {
+                            Color.gray.opacity(0.2)
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                .scaleEffect(2)
+                        }
+                    }
+                    .scaledToFit()
+                    .frame(width: geo.size.width, height: geo.size.height, alignment: .center)
+            }
         }
         .navigationBarBackButtonHidden(true)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(Color(colorScheme == .dark ? .black : .systemBackground), for: .navigationBar)
+        .toolbarColorScheme(colorScheme == .dark ? .dark : .light, for: .navigationBar)
         .toolbar {
-            // Back button
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: { dismiss() }) {
                     Image(systemName: "chevron.left")
@@ -64,14 +59,13 @@ struct PhotoDetailView: View {
                 .imageScale(.large)
             }
 
-            // Title showing author name
             ToolbarItem(placement: .principal) {
                 Text(photo.user.name)
                     .font(.headline)
                     .lineLimit(1)
+                    .foregroundColor(.primary)
             }
 
-            // Info sheet button
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: { showInfoSheet.toggle() }) {
                     Image(systemName: "info.circle")
@@ -79,7 +73,6 @@ struct PhotoDetailView: View {
                 .imageScale(.large)
             }
 
-            // Like / favorite button
             ToolbarItem(placement: .navigationBarTrailing) {
                 let isLiked = appState.isAuthorLiked(author)
                 Button(action: {
@@ -92,7 +85,6 @@ struct PhotoDetailView: View {
                 }
             }
         }
-        // Present info sheet for the photo
         .sheet(isPresented: $showInfoSheet) {
             PhotoInfoSheet(photo: photo)
                 .presentationDetents([.medium, .large])
