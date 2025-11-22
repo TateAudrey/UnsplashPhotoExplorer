@@ -50,6 +50,7 @@ final class UnsplashAPIClient: UnsplashAPIClientProtocol {
     
     /// Fetches random photos from Unsplash API with a given count.
     func fetchRandomPhotos(count: Int = 30) async -> Result<(photos: [Photo], rate: RateLimitInfo?), UnsplashError> {
+        
         guard let url = URL(string: "https://api.unsplash.com/photos/random?count=\(count)") else {
             return .failure(.invalidURL)
         }
@@ -91,7 +92,9 @@ final class UnsplashAPIClient: UnsplashAPIClientProtocol {
     
     /// Searches photos on Unsplash API based on query and pagination.
     func searchPhotos(query: String, page: Int = 1, perPage: Int = 20) async -> Result<(photos: [Photo], total: Int, rate: RateLimitInfo?), UnsplashError> {
+        
         var urlComponents = URLComponents(string: "https://api.unsplash.com/search/photos")
+        
         urlComponents?.queryItems = [
             URLQueryItem(name: "query", value: query),
             URLQueryItem(name: "page", value: String(page)),

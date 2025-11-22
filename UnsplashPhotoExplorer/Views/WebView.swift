@@ -12,7 +12,9 @@ import WebKit
 /// SwiftUI wrapper around WKWebView to display web content
 /// Uses a shared WebView instance from a WebViewModel
 struct WebView: UIViewRepresentable {
+    
     @ObservedObject var viewModel: WebViewModel
+    
     let url: URL
 
     func makeUIView(context: Context) -> WKWebView {

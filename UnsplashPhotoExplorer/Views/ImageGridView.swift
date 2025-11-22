@@ -24,8 +24,6 @@ struct ImageGridView: View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 10) {
                 ForEach(images.prefix(4), id: \.self) { url in
-                    // TODO: Display the image
-                    // e.g., use AsyncImage(url: URL(string: url)) { ... }
                 }
             }
             .padding(10)

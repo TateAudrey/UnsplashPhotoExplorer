@@ -9,7 +9,9 @@ import SwiftUI
 import Kingfisher
 
 struct PhotoDetailView: View {
+    
     let photo: Photo
+    
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) private var dismiss
     @State private var showInfoSheet = false

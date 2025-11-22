@@ -10,6 +10,7 @@ import Kingfisher
 
 /// Main search view for browsing Unsplash photos
 struct SearchView: View {
+    
     @StateObject private var vm = SearchViewModel() // ViewModel managing search state
     
     // Adaptive grid layout

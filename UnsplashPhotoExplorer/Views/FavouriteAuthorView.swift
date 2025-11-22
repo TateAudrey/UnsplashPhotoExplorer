@@ -13,9 +13,6 @@ struct FavouriteAuthorView: View {
     
     /// Shared app state containing liked authors
     @EnvironmentObject var appState: AppState
-    
-    /// Single instance of WebViewModel for navigation
-   // @StateObject private var webViewModel = WebViewModel()
 
     var body: some View {
         NavigationStack {
