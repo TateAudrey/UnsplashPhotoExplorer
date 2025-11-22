@@ -16,9 +16,9 @@ struct ImageGridView: View {
 
     /// 2-column flexible grid layout
     let columns = [
-        GridItem(.adaptive(minimum: UIScreen.main.bounds.width / 3), spacing: 16)
+        GridItem(.flexible(), spacing: 10),
+        GridItem(.flexible(), spacing: 10)
     ]
-
 
     var body: some View {
         ScrollView {

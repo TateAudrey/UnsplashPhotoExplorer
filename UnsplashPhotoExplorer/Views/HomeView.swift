@@ -19,54 +19,42 @@ struct HomeView: View {
     
     /// Adaptive grid layout
     let columns = [
-        GridItem(.adaptive(minimum: UIDevice.current.userInterfaceIdiom == .pad ? 280 : 150), spacing: 16)
+        GridItem(.adaptive(minimum: 150), spacing: 10)
     ]
     
     var body: some View {
         NavigationStack {
-            GeometryReader { geo in
-                // configuration
-                let horizontalPadding: CGFloat = 10
-                let spacing: CGFloat = 10
-
-                // decide columns: 4 for iPad / regular horizontal size class, else 2
-                let isPadLike = UIDevice.current.userInterfaceIdiom == .pad || (geo.size.width > 900)
-                let columnsCount = isPadLike ? 4 : 2
-
-                let totalSpacing = spacing * CGFloat(columnsCount - 1) + (horizontalPadding * 2)
-                let columnWidth = floor((geo.size.width - totalSpacing) / CGFloat(columnsCount))
-
-                ScrollView {
-                    if viewModel.isLoading {
-                        ProgressView()
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .padding(.top, 40)
-                    } else if let errorMessage = viewModel.errorMessage {
-                        Text(errorMessage)
-                            .foregroundColor(.red)
-                            .multilineTextAlignment(.center)
-                            .padding()
-                    } else {
-                        LazyVGrid(
-                            columns: Array(repeating: GridItem(.fixed(columnWidth), spacing: spacing), count: columnsCount),
-                            spacing: spacing
-                        ) {
-                            ForEach(viewModel.photos) { photo in
-                                NavigationLink(
-                                    destination: PhotoDetailView(photo: photo)
-                                ) {
-                                    PhotoGridItemView(
-                                        url: photo.urls.small?.absoluteString ?? "",
-                                        name: photo.user.name, width: columnWidth
-                                    )
-                                }
+            ScrollView {
+                // Loading state
+                if viewModel.isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
+                // Error message state
+                } else if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                
+                // Display photos in adaptive grid
+                } else {
+                    LazyVGrid(columns: columns, spacing: 10) {
+                        ForEach(viewModel.photos) { photo in
+                            NavigationLink(
+                                destination: PhotoDetailView(photo: photo)
+                            ) {
+                                PhotoGridItemView(
+                                    url: photo.urls.small?.absoluteString ?? "",
+                                    name: photo.user.name
+                                )
                             }
                         }
-                        .padding(.horizontal, horizontalPadding)
-                        .padding(.top, 10)
                     }
+                    .padding(10)
                 }
-            }            .navigationBarTitleDisplayMode(.inline)
+            }
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 // Developer info button (logo)
                 ToolbarItem(placement: .topBarLeading) {

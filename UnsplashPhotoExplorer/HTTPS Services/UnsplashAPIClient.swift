@@ -45,11 +45,11 @@ final class UnsplashAPIClient: UnsplashAPIClientProtocol {
     
     /// Convenience method to fetch 20 random photos by default.
     func fetchRandomPhotos() async -> Result<(photos: [Photo], rate: RateLimitInfo?), UnsplashError> {
-        await fetchRandomPhotos(count: 40)
+        await fetchRandomPhotos(count: 20)
     }
     
     /// Fetches random photos from Unsplash API with a given count.
-    func fetchRandomPhotos(count: Int = 40) async -> Result<(photos: [Photo], rate: RateLimitInfo?), UnsplashError> {
+    func fetchRandomPhotos(count: Int = 20) async -> Result<(photos: [Photo], rate: RateLimitInfo?), UnsplashError> {
         guard let url = URL(string: "https://api.unsplash.com/photos/random?count=\(count)") else {
             return .failure(.invalidURL)
         }

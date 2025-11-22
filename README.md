@@ -29,7 +29,7 @@ cd UnsplashPhotoExplorer
 2. Open the project in **Xcode 26** or later.
 3. Sign the Xcode project if needed.
 4. Navigate to UnsplashPhotoExplorer/UnsplashPhotoExplorer/APIConfig -> open Secrets.xconfig file
-5. Add your Unsplash API key: NOTE: Make sure to create your API Key from the Official Unsplash API: https://unsplash.com/developers
+5. Add your Unsplash API key:
 
 * **Preferred (Secrets.xconfig):**
 
